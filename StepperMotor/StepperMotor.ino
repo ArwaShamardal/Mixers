@@ -1,43 +1,64 @@
-/*
- * 28BYJ-48 stepper motor with ULN2003A driver
- */
+// Assume that pulling up/down the mixer takes 5 seconds
+// Assume that any recipe takes 3 seconds to be mixed
 
-#include <AccelStepper.h>           // Load the AccelStepper library
 #include "Constants.h"
 
-int numberOfRevolutions = 2;
-int maximumSpeed = 100;
-int acceleration = 100;
-int currentSpeed = 200;
-
-
-
-AccelStepper stepper(AccelStepper::HALF4WIRE, motorPin1, motorPin3, motorPin2, motorPin4);   // Intitialization of Module
-
 void setup() {
-  Serial.begin(9600);               // initialise the serial monitor
-
-  stepper.setMaxSpeed(maximumSpeed);      // set the max motor speed
-  stepper.setAcceleration(acceleration);   // set the acceleration
-  stepper.setSpeed(currentSpeed);            // set the current speed
-
-  stepper.moveTo(SetNumberOfRevolutions(numberOfRevolutions));   // order the motor to rotate 90 degrees forward
-
+  // put your setup code here, to run once:
+  Serial.begin(9600);
+  pinMode(mixerMotorPin1, OUTPUT);
+  pinMode(mixerMotorPin2, OUTPUT);
+  pinMode(pulleyMotorPin1, OUTPUT);
+  pinMode(pulleyMotorPin2, OUTPUT);
 }
 
 void loop() {
-  stepper.run();                    // start moving the motor
+  // put your main code here, to run repeatedly:   
+
+if(mixerSystemSwitch == ON){
+  // This part os for pulling down the mixer
+  Serial.println("Pulling down");
+  motorEnabler(pulleyMotorPin1,pulleyMotorPin2, ON, DOWN);
+  delay(5000); // to be changed
+
+
+  //This part is for mixing the ingredients
+  Serial.println("Mixing");
+  motorEnabler(pulleyMotorPin1,pulleyMotorPin2, OFF, UNDECLARED);
+  motorEnabler(mixerMotorPin1,mixerMotorPin2, ON, UNDECLARED);
+  delay(3000); // to be changed
+
+
+  //This part is for pulling up the mixer  
+  Serial.println("Pulling up");
+  motorEnabler(mixerMotorPin1,mixerMotorPin2, OFF, UNDECLARED);
+  motorEnabler(pulleyMotorPin1,pulleyMotorPin2, ON, UP);
+  delay(5000); // to be changed
+
+  //System shutting down
+  Serial.println("system turining off");
+  motorEnabler(pulleyMotorPin1,pulleyMotorPin2, OFF, UNDECLARED);
+  mixerSystemSwitch = OFF;
+
 }
 
-/*
- * Converts degrees to steps
- * 
- * 28BYJ-48 motor has 5.625 degrees per step
- * 360 degrees / 5.625 = 64 steps per revolution
- * 
- * Example with degToSteps(45):
- * (64 / 5.625) * 45 = 512 steps
- */
-float SetNumberOfRevolutions(float revolutions) {
-  return (stepPerRevolution / degreePerStep) * revolutions * 360;
+  delay(1000);             // to be removed
+  Serial.println("Done");  // to be removed
+}
+
+void motorEnabler(uint8_t motorPin1,uint8_t motorPin2, enum switcher switcher, enum pullDirection pullDirection){
+  if(switcher == ON){
+    if(pullDirection == UP || pullDirection == UNDECLARED){
+      digitalWrite(motorPin1, HIGH);
+      digitalWrite(motorPin2, LOW);
+    }
+    else if(pullDirection == DOWN){
+      digitalWrite(motorPin1, LOW);
+      digitalWrite(motorPin2, HIGH);  
+    }
+  }
+  else if (switcher = OFF){
+    digitalWrite(motorPin1, LOW);
+    digitalWrite(motorPin2, LOW);
+  }
 }

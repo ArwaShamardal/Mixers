@@ -1,14 +1,20 @@
 #ifndef H_A
 #define H_A
 
-#define motorPin1  8                // IN1 pin on the ULN2003A driver
-#define motorPin2  9                // IN2 pin on the ULN2003A driver
-#define motorPin3  10               // IN3 pin on the ULN2003A driver
-#define motorPin4  11               // IN4 pin on the ULN2003A driver
-
-
-int stepPerRevolution = 64;        // steps per revolution
-float degreePerStep = 5.625;  // degree per revolution
+enum switcher {
+  ON, // enable
+  OFF // disable
+};
+enum pullDirection {
+  UP,  
+  DOWN,
+  UNDECLARED 
+};
+const uint8_t mixerMotorPin1 = 2;
+const uint8_t mixerMotorPin2 = 3;
+const uint8_t pulleyMotorPin1 = 4;
+const uint8_t pulleyMotorPin2 = 5;
+enum switcher mixerSystemSwitch = ON;
 
 #endif
 
