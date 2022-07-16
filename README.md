@@ -1,4 +1,4 @@
-# Mixers
+# Mixers sub-team
 CMPN211 - Micrprocessors 2 subteam
 
 Team Memebers
